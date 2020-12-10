@@ -1,3 +1,3 @@
 ### MyTodo_Api
 
-Technical Test Young on Top
+dibuat menggunakan node.js, sequelize dan express
