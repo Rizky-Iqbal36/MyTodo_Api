@@ -24,35 +24,31 @@ exports.cloudUpload = (fieldName) => {
       limitSize = "2 MB";
     }
 
-    if (!file.mimetype.match(fileType)) {
-      req.fileValidationError = {
-        status: "fail",
-        message: `Please select an ${fileType} file!`,
-        code: 400,
-      };
-      return cb(new Error(`Please select an ${fileType} file!`), false);
-    }
+    // if (!file.mimetype.match(fileType)) {
+    //   req.fileValidationError = {
+    //     status: "fail",
+    //     message: `Please select an ${fileType} file!`,
+    //     code: 400,
+    //   };
+    //   return cb(new Error(`Please select an ${fileType} file!`), false);
+    // }
 
     cb(null, true);
   };
 
   let upload;
-  if (fieldName === "avatar") {
+  if (
+    fieldName === "thumbnailParentCard" ||
+    fieldName === "thumbnailChildCard" ||
+    fieldName === "avatar"
+  ) {
     upload = multer({
       storage,
       fileFilter,
       limits: {
         fileSize: 2 * 1000 * 1000,
       },
-    }).single("avatar");
-  } else {
-    upload = multer({
-      storage,
-      fileFilter,
-      limits: {
-        fileSize: 2 * 1000 * 1000,
-      },
-    }).single("image");
+    }).single(fieldName);
   }
 
   return (req, res, next) => {
@@ -60,12 +56,12 @@ exports.cloudUpload = (fieldName) => {
       if (req.fileValidationError)
         return res.status(400).send(req.fileValidationError);
 
-      if (!req.file && !req.files && !err)
-        return res.status(400).send({
-          status: "fail",
-          message: "Please select a file to upload",
-          code: 400,
-        });
+      // if (!req.file && !req.files && !err)
+      //   return res.status(400).send({
+      //     status: "fail",
+      //     message: "Please select a file to upload",
+      //     code: 400,
+      //   });
 
       if (err) {
         if (err.code === "LIMIT_FILE_SIZE") {

@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
   ParentCards.init(
     {
       title: DataTypes.STRING,
+      description: DataTypes.TEXT,
       uploadBy: DataTypes.INTEGER,
       thumbnailParentCard: DataTypes.STRING,
     },

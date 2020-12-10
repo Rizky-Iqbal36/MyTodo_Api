@@ -79,11 +79,12 @@ exports.readOne = async (req, res) => {
 };
 exports.create = async (req, res) => {
   try {
-    const { title, description, status } = req.body;
+    const { title, description, status, parentId } = req.body;
     const schema = joi.object({
       title: joi.string().required(),
       description: joi.string(),
       status: joi.string().required(),
+      parentId: joi.number().required(),
     });
     const { error } = schema.validate(req.body);
     if (error) {
@@ -93,10 +94,17 @@ exports.create = async (req, res) => {
         },
       });
     }
-    const creatChildCard = await ChildCards.create({
-      ...req.body,
-      thumbnailChildCard: req.file.filename,
-    });
+    let creatChildCard = [];
+    if (!req.file) {
+      creatChildCard = await ChildCards.create({
+        ...req.body,
+      });
+    } else {
+      creatChildCard = await ChildCards.create({
+        ...req.body,
+        thumbnailChildCard: req.file.filename,
+      });
+    }
     res.status(200).send({
       message: "New child card has successfully created",
       data: { creatChildCard },

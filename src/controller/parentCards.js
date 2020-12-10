@@ -1,6 +1,42 @@
 const { ParentCards, ChildCards, cardRelations } = require("../../models");
 const joi = require("joi");
 
+exports.parentCardsByUser = async (req, res) => {
+  try {
+    const { uploadBy } = req.params;
+    const loadParentCards = await ParentCards.findAll({
+      include: {
+        model: ChildCards,
+        as: "child",
+        through: {
+          model: cardRelations,
+          as: "data",
+          attributes: {
+            exclude: ["createdAt", "updatedAt"],
+          },
+        },
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "password"],
+        },
+      },
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+      where: { uploadBy },
+    });
+    res.status(200).send({
+      message: `User with id:${uploadBy}'s parent cards succesfully loaded`,
+      data: { loadParentCards },
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      error: {
+        message: "Server ERROR :(",
+      },
+    });
+  }
+};
 exports.read = async (req, res) => {
   try {
     const loadParentCards = await ParentCards.findAll({
@@ -79,10 +115,11 @@ exports.readOne = async (req, res) => {
 };
 exports.create = async (req, res) => {
   try {
-    const { title, uploadBy } = req.body;
+    const { title, uploadBy, description } = req.body;
     const schema = joi.object({
       title: joi.string().required(),
-      uploadBy: joi.number().required(),
+      description: joi.string().allow("", null),
+      uploadBy: joi.required(),
     });
     const { error } = schema.validate(req.body);
     if (error) {
@@ -92,10 +129,17 @@ exports.create = async (req, res) => {
         },
       });
     }
-    const createParentCard = await ParentCards.create({
-      ...req.body,
-      thumbnailParentCard: req.file.filename,
-    });
+    let createParentCard = [];
+    if (!req.file) {
+      createParentCard = await ParentCards.create({
+        ...req.body,
+      });
+    } else {
+      createParentCard = await ParentCards.create({
+        ...req.body,
+        thumbnailParentCard: req.file.filename,
+      });
+    }
     res.status(200).send({
       message: "New parent card has successfully created",
       data: { createParentCard },
@@ -149,9 +193,11 @@ exports.updateContent = async (req, res) => {
       });
     }
     const body = req.body;
+    console.log(body);
     await ParentCards.update(
       {
         title: body.title,
+        description: body.description,
       },
       { where: { id } }
     );
@@ -186,7 +232,7 @@ exports.updateThumbnail = async (req, res) => {
     }
     res.send({
       status: "success",
-      message: `There is no parent card with id:${id}`,
+      message: `Parent card with id:${id} successfully updated`,
       path: req.file.path,
     });
   } catch (err) {
