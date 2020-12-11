@@ -63,6 +63,7 @@ router.patch(
 const {
   read: getChildCards,
   readOne: getChildCard,
+  readStatus: getChildCardsByStatus,
   create: createChildCard,
   delete: deleteChildCard,
   updateContent: updateContentChildCard,
@@ -72,6 +73,11 @@ const {
 //router childCards
 router.get("/childCards", authentication, getChildCards);
 router.get("/childCard/:id", authentication, getChildCard);
+router.get(
+  "/childCardsByStatus/:status/:parentId",
+  authentication,
+  getChildCardsByStatus
+);
 router.post(
   "/post-childCard",
   authentication,

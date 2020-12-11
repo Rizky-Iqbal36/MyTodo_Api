@@ -1,4 +1,9 @@
-const { ParentCards, ChildCards, cardRelations } = require("../../models");
+const {
+  ParentCards,
+  ChildCards,
+  cardRelations,
+  Users,
+} = require("../../models");
 const joi = require("joi");
 
 exports.parentCardsByUser = async (req, res) => {
@@ -40,22 +45,50 @@ exports.parentCardsByUser = async (req, res) => {
 exports.read = async (req, res) => {
   try {
     const loadParentCards = await ParentCards.findAll({
-      include: {
-        model: ChildCards,
-        as: "child",
-        through: {
-          model: cardRelations,
-          as: "data",
+      include: [
+        {
+          model: ChildCards,
+          as: "child",
+          through: {
+            model: cardRelations,
+            as: "data",
+            attributes: {
+              exclude: [
+                "createdAt",
+                "updatedAt",
+                "UserId",
+                "ParentCardId",
+                "ChildCardId",
+              ],
+            },
+          },
           attributes: {
-            exclude: ["createdAt", "updatedAt"],
+            exclude: ["createdAt", "updatedAt", "password"],
           },
         },
-        attributes: {
-          exclude: ["createdAt", "updatedAt", "password"],
+        {
+          model: Users,
+          as: "users",
+          through: {
+            model: cardRelations,
+            as: "data",
+            attributes: {
+              exclude: [
+                "createdAt",
+                "updatedAt",
+                "UserId",
+                "ParentCardId",
+                "ChildCardId",
+              ],
+            },
+          },
+          attributes: {
+            exclude: ["createdAt", "updatedAt", "password"],
+          },
         },
-      },
+      ],
       attributes: {
-        exclude: ["createdAt", "updatedAt"],
+        exclude: ["createdAt", "updatedAt", "password"],
       },
     });
     res.status(200).send({

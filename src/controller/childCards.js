@@ -35,7 +35,42 @@ exports.read = async (req, res) => {
     });
   }
 };
-
+exports.readStatus = async (req, res) => {
+  try {
+    const { status, parentId } = req.params;
+    const loadChildCards = await ChildCards.findAll({
+      include: {
+        model: ParentCards,
+        as: "parent",
+        through: {
+          model: cardRelations,
+          as: "data",
+          attributes: {
+            exclude: ["createdAt", "updatedAt"],
+          },
+        },
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "password"],
+        },
+      },
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+      where: { status, parentId },
+    });
+    res.status(200).send({
+      message: `Child card with status: ${status} and parentId: ${parentId} has successfully Loaded`,
+      data: { loadChildCards },
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      error: {
+        message: "Server ERROR :(",
+      },
+    });
+  }
+};
 exports.readOne = async (req, res) => {
   try {
     const { id } = req.params;
@@ -82,7 +117,7 @@ exports.create = async (req, res) => {
     const { title, description, status, parentId } = req.body;
     const schema = joi.object({
       title: joi.string().required(),
-      description: joi.string(),
+      description: joi.string().allow(null, ""),
       status: joi.string().required(),
       parentId: joi.number().required(),
     });
