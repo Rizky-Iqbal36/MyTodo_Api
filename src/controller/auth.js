@@ -55,6 +55,7 @@ exports.register = async (req, res) => {
         .required(),
       address: joi.string().required(),
       isAdmin,
+      avatar,
     });
 
     const { error } = schema.validate(req.body);

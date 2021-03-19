@@ -23,11 +23,12 @@ const {
 //router users
 router.get("/users", loadUsers);
 router.get("/user/:id", loadUser);
-router.patch("/user/:id", authentication, upload("avatar"), updateUser);
+router.patch("/user/:id", authentication, cloudUpload("avatar"), updateUser);
 
 //controller parentCards
 const {
   read: getParentCards,
+  parentCardsByUser,
   readOne: getParentCard,
   create: createParentCard,
   delete: deleteParentCard,
@@ -37,11 +38,12 @@ const {
 
 //router parentCards
 router.get("/parentCards", authentication, getParentCards);
+router.get("/parentCards/:uploadBy", authentication, parentCardsByUser);
 router.get("/parentCard/:id", authentication, getParentCard);
 router.post(
   "/post-parentCard",
   authentication,
-  upload("thumbnailParentCard"),
+  cloudUpload("thumbnailParentCard"),
   createParentCard
 );
 router.delete("/delete-parentCard/:id", authentication, deleteParentCard);
@@ -53,7 +55,7 @@ router.patch(
 router.patch(
   "/updateThumbnail-parentCard/:id",
   authentication,
-  upload("thumbnailParentCard"),
+  cloudUpload("thumbnailParentCard"),
   updateThumbnailParentCard
 );
 
@@ -73,7 +75,7 @@ router.get("/childCard/:id", authentication, getChildCard);
 router.post(
   "/post-childCard",
   authentication,
-  upload("thumbnailChildCard"),
+  cloudUpload("thumbnailChildCard"),
   createChildCard
 );
 router.delete("/delete-childCard/:id", authentication, deleteChildCard);
@@ -85,7 +87,7 @@ router.patch(
 router.patch(
   "/updateThumbnail-childCard/:id",
   authentication,
-  upload("thumbnailChildCard"),
+  cloudUpload("thumbnailChildCard"),
   updateThumbnailChildCard
 );
 //controller relations

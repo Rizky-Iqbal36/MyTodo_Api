@@ -9,14 +9,14 @@ app.use(express.json());
 app.use(cors());
 
 //public
-app.use("/public/avatars", express.static("/public/avatars"));
+app.use("/public/avatars", express.static("public/avatars"));
 app.use(
   "/public/thumbnailParentCards",
-  express.static("/public/thumbnailParentCards")
+  express.static("public/thumbnailParentCards")
 );
 app.use(
   "/public/thumbnailChildCards",
-  express.static("/public/thumbnailChildCards")
+  express.static("public/thumbnailChildCards")
 );
 app.use("/api/v1", router);
 app.get("/", (req, res) => {
